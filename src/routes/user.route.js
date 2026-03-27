@@ -37,7 +37,8 @@ router.get("/current-user", verifyJwt, getCurrentUser);
 
 router.post("/change-password", verifyJwt, changePassword);
 
-router.post("/change-avtar", verifyJwt, cpUpload, changeAvtarImage )
-router.post("/change-coverimage", verifyJwt, cpUpload, changeCoverImage )
+router.post("/change-avtar", verifyJwt, upload.single("avtar"), changeAvtarImage )
+router.post("/change-coverimage", verifyJwt, upload.single("coverImage"), changeCoverImage )
+
 
 export default router;
