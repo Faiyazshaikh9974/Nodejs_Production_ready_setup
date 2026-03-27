@@ -1,0 +1,158 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# Environment Variables
+.env
+.env.local
+.env.*.local
+.env.development
+.env.staging
+.env.production
+
+# IDE and Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.iml
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+*.sublime-project
+
+# Operating System Files
+Thumbs.db
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Build and Distribution
+dist/
+build/
+out/
+*.tsbuildinfo
+
+# Test Coverage
+coverage/
+.nyc_output/
+
+# Temporary Files
+temp/
+tmp/
+*.tmp
+*.bak
+*.log
+logs/
+
+# OS Generated Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+# Node-specific
+npm-debug.log
+lerna-debug.log
+
+# Local development
+.env.development
+.env.test
+.env.staging
+
+# Third-party
+.cache/
+.eslintcache
+.stylelintcache
+
+# Build and Compilation
+*.o
+*.a
+*.so
+*.dylib
+*.exe
+*.out
+
+# Dependencies Lock Files (optional - uncomment if you want to commit them)
+# package-lock.json
+# yarn.lock
+
+# Uploaded Files and Media
+public/temp/*
+public/uploads/*
+uploads/*
+!public/temp/.gitkeep
+!public/uploads/.gitkeep
+
+# Database Files
+*.db
+*.sqlite
+*.sqlite3
+mongodb/
+
+# Backups
+*.backup
+*.bak
+*.sql
+
+# IDE Specific
+.vscode/settings.json
+.vscode/extensions.json
+.vscode/launch.json
+.vscode/tasks.json
+
+# Debugging
+debug.log
+debug/
+
+# PM2
+ecosystem.config.js.local
+logs/
+
+# NVM
+.nvmrc
+
+# pnpm
+pnpm-lock.yaml
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Output of 'npm pack'
+*.tgz
+
+# dotenv environment variables file
+.env.example
+
+# Mac files
+.DS_Store
+
+# Misc
+*.pem
+*.key
+*.crt
+
+# Production Build
+dist/
+build/
+out/
+
+# Miscellaneous
+.prettierignore
+.prettierrc.local
