@@ -15,7 +15,7 @@ const uploadImage = async (localFilePath) => {
       resource_type: "auto",
     });
 
-    console.log("File Uploade On Cloud Successfully", response.url);
+    console.log("File Uploade On Cloud Successfully", response);
     return response;
   } catch (error) {
     await fs.unlink(localFilePath); //remove file from local

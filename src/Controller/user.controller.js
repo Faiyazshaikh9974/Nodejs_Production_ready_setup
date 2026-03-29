@@ -4,6 +4,7 @@ import { ApiError } from "../utils/apiError.js";
 import { User } from "../models/User.model.js";
 import { uploadImage } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/apiResponse.js";
+import { upload } from "../middlewares/multer.middleware.js";
 
 const registerUserSchema = z.object({
   email: z.string().email("Invalid Email"),
@@ -12,7 +13,6 @@ const registerUserSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters"),
   avtar: z.string().url("Avtar must be a valid url").optional(),
 });
-
 
 //utility function for generating the access and refresh token...
 const generateRefreshTokenAndAccessToken = async (id) => {
@@ -61,16 +61,17 @@ export const registerUser = asyncHandlerPromises(async (req, res) => {
     throw new ApiError(409, "username or email is already exists ");
   }
 
-  let avtarImage = req.files?.avtar?.[0]?.path;
+  const avtarImage = req.files?.avtar?.[0]?.path;
   const coverImage = req.files?.coverImage?.[0]?.path;
-  console.log(coverImage);
 
   if (!avtarImage) {
     throw new ApiError(409, "avtar image is empty..");
   }
 
-  let avtarImageCloud = await uploadImage(avtarImage);
-  let coverImageCloud = await uploadImage(coverImage);
+  const [avtarImageCloud, coverImageCloud] = await Promise.all([
+    uploadImage(avtarImage),
+    coverImage ? uploadImage(coverImage) : null,
+  ]);
 
   const avtarUrl = avtarImageCloud.url;
   const coverImageUrl = coverImageCloud.url;
@@ -83,8 +84,9 @@ export const registerUser = asyncHandlerPromises(async (req, res) => {
     username: username.toLowerCase(),
     fullName: fullName,
     password: password,
-    avtar: avtarUrl,
-    coverImage: coverImageUrl || "",
+    avtar: { url: avtarUrl, public_id: avtarImageCloud.public_id },
+    coverImage:
+      { url: coverImageUrl, public_id: coverImageCloud.public_id } || {},
   };
 
   const user = new User(userData);
@@ -174,7 +176,6 @@ export const logoutUser = asyncHandlerPromises(async (req, res) => {
     .json(new ApiResponse(200, {}, "User logged out successfully"));
 });
 
-
 //regerate refresh Token after expery
 export const RefreshToken = asyncHandlerPromises(async (req, res) => {
   const inCommingRefreshToken = req.cookies.refreshToken;
@@ -223,7 +224,6 @@ export const RefreshToken = asyncHandlerPromises(async (req, res) => {
     .cookie("accessToken", accessToken, cookieOptions)
     .json(new ApiResponse(200, user, "Refresh and Access Token Regenerated"));
 });
-
 
 //change password..
 export const changePassword = asyncHandlerPromises(async (req, res) => {
@@ -276,7 +276,6 @@ export const getCurrentUser = asyncHandlerPromises(async (req, res) => {
     );
 });
 
-
 export const updateAccountDetail = asyncHandlerPromises(async (req, res) => {
   //get all the detail from the body
   //find the user
@@ -315,6 +314,8 @@ export const updateAccountDetail = asyncHandlerPromises(async (req, res) => {
 export const changeAvtarImage = asyncHandlerPromises(async (req, res) => {
   const NewfilePath = req.file?.path;
 
+  const oldUser = User.findById(req.user?._id);
+
   if (!NewfilePath) {
     throw new ApiError(400, "Image field is required..");
   }
@@ -332,11 +333,20 @@ export const changeAvtarImage = asyncHandlerPromises(async (req, res) => {
     req.user?._id,
     {
       $set: {
-        avtar: response.url,
+        avtar: {
+          url: response.url,
+          public_id: response.public_id,
+        },
       },
     },
     { new: true },
   ).select("-password");
+
+  //delete the previous avtar image from the cloudinary after uploading the new image
+
+  if (oldUser?.avtar?.public_id) {
+    await cloudinary.uploader.destroy(oldUser.avtar.public_id);
+  }
 
   return res
     .status(200)
