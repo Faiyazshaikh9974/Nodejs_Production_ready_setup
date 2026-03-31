@@ -6,6 +6,7 @@ import { uploadImage } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { $ZodE164 } from "zod/v4/core";
+import mongoose from "mongoose";
 
 const registerUserSchema = z.object({
   email: z.string().email("Invalid Email"),
@@ -459,8 +460,8 @@ export const getUserChannelProfile = asyncHandlerPromises(async (req, res) => {
 });
 
 export const getWatchHistory = asyncHandlerPromises(async (req, res) => {
-  const user = User.aggregate([
-    { $match: { _id: new mongoose.Types.objectId(req.user?._id) } },
+  const user = await User.aggregate([
+    { $match: { _id: new mongoose.Types.ObjectId(req.user?._id) } },
 
     {
       $lookup: {
@@ -499,7 +500,7 @@ export const getWatchHistory = asyncHandlerPromises(async (req, res) => {
     .json(
       new ApiResponse(
         200,
-        user[0].watchHistory,
+        user[0].getWatchHistory,
         "user watch history fetched successfully..",
       ),
     );
