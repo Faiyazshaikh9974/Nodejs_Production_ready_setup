@@ -5,6 +5,7 @@ import { User } from "../models/User.model.js";
 import { uploadImage } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { upload } from "../middlewares/multer.middleware.js";
+import { $ZodE164 } from "zod/v4/core";
 
 const registerUserSchema = z.object({
   email: z.string().email("Invalid Email"),
@@ -389,7 +390,7 @@ export const changeCoverImage = asyncHandlerPromises(async (req, res) => {
     .json(new ApiResponse(200, user, "CoverImage Updated Successfully.."));
 });
 
-const getUserChannelProfile = asyncHandlerPromises(async (req, res) => {
+export const getUserChannelProfile = asyncHandlerPromises(async (req, res) => {
   const { username } = req.params;
   const userProfile = await User.aggregate([
     {
@@ -454,5 +455,52 @@ const getUserChannelProfile = asyncHandlerPromises(async (req, res) => {
     .status(200)
     .json(
       new ApiResponse(200, userProfile[0], "User channel fetched successfully"),
+    );
+});
+
+export const getWatchHistory = asyncHandlerPromises(async (req, res) => {
+  const user = User.aggregate([
+    { $match: { _id: new mongoose.Types.objectId(req.user?._id) } },
+
+    {
+      $lookup: {
+        from: "videos",
+        localField: "watchlist",
+        foreignField: "_id",
+        as: "watchHistory",
+        pipeline: [
+          {
+            $lookup: {
+              from: "users",
+              localField: "owner",
+              foreignField: "_id",
+              as: "owner",
+              pipeline: [
+                {
+                  $project: {
+                    avtar: 1,
+                    username: 1,
+                    fullName: 1,
+                  },
+                },
+              ],
+            },
+          },
+          { $unwind: "$owner" },
+        ],
+      },
+    },
+  ]);
+
+  console.log(user);
+
+  res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        user[0].watchHistory,
+        "user watch history fetched successfully..",
+      ),
     );
 });

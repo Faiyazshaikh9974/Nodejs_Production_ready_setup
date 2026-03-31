@@ -4,6 +4,8 @@ import {
   changeCoverImage,
   changePassword,
   getCurrentUser,
+  getUserChannelProfile,
+  getWatchHistory,
   loginUser,
   logoutUser,
   RefreshToken,
@@ -39,6 +41,10 @@ router.post("/change-password", verifyJwt, changePassword);
 
 router.post("/change-avtar", verifyJwt, upload.single("avtar"), changeAvtarImage )
 router.post("/change-coverimage", verifyJwt, upload.single("coverImage"), changeCoverImage )
+
+router.get("/channel/:username", verifyJwt, getUserChannelProfile);
+
+router.get("/watch-history", verifyJwt, getWatchHistory);
 
 
 export default router;
