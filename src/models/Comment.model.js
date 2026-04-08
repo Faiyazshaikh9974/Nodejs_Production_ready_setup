@@ -23,4 +23,4 @@ const commentSchema = mongoose.Schema(
 );
 
 
-export const Comment = mongoose.Model("Comment", commentSchema) ;
+export const Comment = mongoose.model("Comment", commentSchema) ;
