@@ -18,7 +18,7 @@ const commentSchema = mongoose.Schema(
     },
   },
   {
-    timestaps: true,
+    timestamps: true,
   },
 );
 
