@@ -105,11 +105,25 @@ export const deleteComment = asyncHandlerPromises(async (req, res) => {
     throw new ApiError(400, "CommentId is Empty");
   }
 
+  const exitingComment = await Comment.findOneById(commentId);
+
+  if (exitingComment.owner != req.user._id) {
+    throw new ApiError(400, "Access Denied you can't delete the comment");
+  }
+
+    const deletedComment = await Comment.findByIdAndDelete({ id: commentId });
+
+    if(!deletedComment){
+      throw new ApiError(500, "Unable to delete the comment");
+    }
+
+    res.status(200).json(new ApiResponse(200, deletedComment, "Comment deleted successfully.."));
+
   //find comment by id,
   //check if the comment exist or not,
   //only owner of the comment can delete,
   //delete the comment,
   //return response,
 
-  
+
 });
