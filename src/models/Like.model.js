@@ -3,8 +3,8 @@ import mongoose from "mongoose";
 const likeSchema = mongoose.Schema(
   {
     likedBy: {
-      type: String,
-      required: true,
+      type: mongoose.Types.ObjectId,
+      ref: "User"
     },
 
     video: {

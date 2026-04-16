@@ -493,7 +493,6 @@ export const getWatchHistory = asyncHandlerPromises(async (req, res) => {
     },
   ]);
 
-  console.log(user);
 
   res
     .status(200)
