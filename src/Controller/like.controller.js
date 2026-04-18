@@ -38,21 +38,22 @@ export const toggleCommentLike = asyncHandlerPromises(async (req, res) => {
 
   const commentObjId = new mongoose.Types.ObjectId(commentId);
 
-  const exitingLike = await Like.findOne({
+  const deleted = await Like.delete({
     LikedBy: req.user._id,
     comment: commentObjId,
   });
-
-  if (exitingLike) {
-    await Like.findByIdAndDelete(exitingLike._id);
-  } else {
-    await Like.create({
-      LikedBy: req.user._id,
-      comment: commentObjId,
-    });
-
-    res.status(200).json(new ApiResponse(200, null, "Comment Liked"));
+  if(deleted) {
+    res.status(200).json(new ApiResponse(200, null, "comment unLiked"));
   }
+
+  await Like.create({
+    LikedBy: req.user._id,
+    comment: commentObjId
+  })
+
+  return res.status(200).json(new ApiResponse(200, null, "Comment Liked"));
+
+   
 });
 
 export const toggleTweetLike = asyncHandlerPromises(async (req, res) => {
@@ -94,21 +95,22 @@ export const getAllLikedVideos = asyncHandlerPromises(async (req, res) => {
         localField: "video",
         foreignField: "_id",
         as: "allLikedVideos",
-        
       },
     },
 
     {
       $unwind: "$allLikedVideos",
     },
-    {$lookup: {
+    {
+      $lookup: {
         from: "users",
         localField: "allLikedVideos.owner",
         foreignField: "_id",
-        as: "allLikedVideos.owner"
-    }},
+        as: "owner",
+      },
+    },
 
-    {$unwind: "$allLikedVideos.owner"},
+    { $unwind: "$owner" },
 
     {
       $project: {
@@ -127,4 +129,18 @@ export const getAllLikedVideos = asyncHandlerPromises(async (req, res) => {
       },
     },
   ]);
+
+  if (!LikedVideos) {
+    throw new ApiError(400, "Something went wrong with Database Query");
+  }
+
+  res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        LikedVideos,
+        "All Liked Video fetched Successfully..",
+      ),
+    );
 });

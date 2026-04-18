@@ -5,6 +5,7 @@ import express from "express";
 import cors from "cors";
 import {router } from "./src/routes/user.route.js"
 import { Commentrouter } from "./src/routes/comment.route.js";
+import { LikeRouter } from "./src/routes/like.route.js";
 const app = express();
 const Port = process.env.PORT || 4000;
 app.use(
@@ -26,6 +27,10 @@ app.use(cookieParser());
 app.use("/api/v1/user", router);
 
 app.use("/api/v1/comments", Commentrouter)
+
+app.use("/like", LikeRouter );
+
+
 
 DBconnect().then(() => {
   app.listen(Port, () => {
