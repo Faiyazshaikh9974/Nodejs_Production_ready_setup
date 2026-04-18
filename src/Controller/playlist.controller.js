@@ -53,18 +53,97 @@ export const getUserPlayLists = asyncHandlerPromises(async (req, res) => {
     );
 });
 
-export const getPlayListById = asyncHandlerPromises ( async (req, res) => {
-    const {palyListId} = req.params;
+export const getPlayListById = asyncHandlerPromises(async (req, res) => {
+  const { palyListId } = req.params;
 
-    if(!playListId){
-        throw new ApiError(400, "playList Id is missing...")
+  if (!playListId) {
+    throw new ApiError(400, "playList Id is missing...");
+  }
+
+  const playList = await PlayList.findOneById(playListId);
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, playList, "PlayList fetched successfully..."));
+});
+
+export const addVideoToPlayList = asyncHandlerPromises(async (req, res) => {
+  const { videoId, playListId } = req.params;
+
+  if (!videoId) {
+    throw new ApiError(400, "videoId is undefine");
+  }
+
+  if (!playListId) {
+    throw new ApiError(400, "playListId is undefine");
+  }
+
+  const addedVideo = PlayList.findByIdAndUpdate(
+    playListId,
+    { $push: { video: videoId } },
+    { new: true },
+  );
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, addedVideo, "Video successfully Added"));
+});
+
+export const deleteVideoFromPlayList = asyncHandlerPromises(
+  async (req, res) => {
+    const { videoId, playListId } = req.params;
+
+    if (!videoId) {
+      throw new ApiError(400, "videoId is empty");
     }
 
-    const playList = await PlayList.findOneById(playListId);
+    if (!playListId) {
+      throw new ApiError(400, "playListId is empty");
+    }
 
-    return res.status(200).json( new ApiResponse(200, playList, "PlayList fetched successfully..."))
+    const deletedVideo = await playList.findByIdAndDelete(
+      playListId,
+      { $pull: { video: videoId } },
+      { new: true },
+    );
+
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(200, deletedVideo, "video removed from playList.."),
+      );
+  },
+);
+
+export const deletePlayList = asyncHandlerPromises( async( req, res) => {
+    const {playListId} = req.params;
+
+    if(!playListId){
+        throw new ApiError(400, "playList id is Empty")
+    }
+
+    await PlayList.findByIdAndDelete(playListId);
+
+    return res.status(200).json(200, null, "PlayList Deleted successfully.." )
 })
 
-export const addVideoToPlayList = asyncHandlerPromises( async( req, res)=> {
-    
+export const updatePlayListDetail = asyncHandlerPromises( async( req, res) =>{
+    const {playListId} = req.params;
+    const {name, description} = req.body;
+
+    if(!playListId){
+        throw new ApiError(400, "playList id is missing")
+    }
+    if(!name && !description){
+        throw new ApiError(400, "name and description is missing")
+    }
+
+    await playList.findByIdAndUpdate(
+        playListId,
+        {$set: {
+            name: name,
+            description: description
+        }},
+
+    )
 })
