@@ -134,7 +134,7 @@ export const updatePlayListDetail = asyncHandlerPromises( async( req, res) =>{
     if(!playListId){
         throw new ApiError(400, "playList id is missing")
     }
-    if(!name && !description){
+    if((!name && !description)){
         throw new ApiError(400, "name and description is missing")
     }
 

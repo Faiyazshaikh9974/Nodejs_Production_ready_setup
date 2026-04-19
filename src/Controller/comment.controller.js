@@ -7,7 +7,7 @@ import { ApiResponse } from "../utils/apiResponse.js";
 export const getVideoComments = asyncHandlerPromises(async (req, res) => {
   const { videoId } = req.params;
 
-  if (!videoId) {
+  if (!videoId) { 
     throw new ApiError(404, "VideoId is not found in params");
   }
 
