@@ -12,7 +12,7 @@ const tweetSchema = mongoose.Schema(
       ref: "User"
     }
   },
-  { timestamp: true },
+  { timestamps: true },
 );
 
 export const Tweet = mongoose.model("Tweet", tweetSchema); 
